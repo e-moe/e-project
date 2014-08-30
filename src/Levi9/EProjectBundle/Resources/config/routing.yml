@@ -1,3 +1,0 @@
-levi9_e_project_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: Levi9EProjectBundle:Default:index }

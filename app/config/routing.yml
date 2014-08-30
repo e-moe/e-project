@@ -1,0 +1,4 @@
+levi9_e_project:
+    resource: "@Levi9EProjectBundle/Controller"
+    type:     annotation
+
