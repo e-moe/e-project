@@ -3,16 +3,12 @@
 namespace Levi9\EProjectBundle\Controller;
 
 use Levi9\EProjectBundle\Entity\Row;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class DefaultController
- * @package Levi9\EProjectBundle\Controller
- * @Route("/")
- */
 class DefaultController extends Controller
 {
     /**
@@ -21,8 +17,11 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        $rows = $this->getRows();
-        return array('rows' => $rows);
+        $stat = $this->getStatistics();
+        return array(
+            'stat' => $stat,
+            'reset' => $form = $this->getResetForm()->createView()
+        );
     }
 
     /**
@@ -32,17 +31,11 @@ class DefaultController extends Controller
     public function addAction(Request $request)
     {
         $row = new Row();
-        $form = $this->createFormBuilder($row)
-            ->add('name')
-            ->add('type')
-            ->add('count')
-            ->add('save', 'submit', array('label' => 'Add Battery'))
-            ->getForm();
+        $form = $this->getAddForm($row);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            // perform some action, such as saving the task to the database
             $this->getDoctrine()->getManager()->persist($row);
             $this->getDoctrine()->getManager()->flush();
             return $this->redirect($this->generateUrl('levi9_eproject_default_index'));
@@ -52,25 +45,63 @@ class DefaultController extends Controller
     }
 
     /**
-     * Get sorted list of all rows
+     * Get form for adding new row
      *
-     * @return array|\Levi9\EProjectBundle\Entity\Row[]
+     * @param Row $row
+     * @return \Symfony\Component\Form\Form
      */
-    protected function getRows()
+    protected function getAddForm(Row $row)
     {
-        return $this->getRepository()->findBy(
-            array(),
-            array('count' => 'DESC')
-        );
+        return $this->createFormBuilder($row)
+            ->add('type')
+            ->add('count', 'integer', array('attr' => array('min' => 1)))
+            ->add('name')
+            ->add('add', 'submit', array('label' => 'Add Battery'))
+            ->getForm();
     }
 
     /**
-     * Get Row repository
+     * Get form for statistics reset
      *
-     * @return \Doctrine\Common\Persistence\ObjectRepository
+     * @return \Symfony\Component\Form\Form
      */
-    protected function getRepository()
+    protected function getResetForm()
     {
-        return $this->getDoctrine()->getRepository('Levi9EProjectBundle:Row');
+        return $this->createFormBuilder()
+            ->add('reset', 'submit', array('label' => 'Reset all data'))
+            ->setAction($this->generateUrl('levi9_eproject_default_reset'))
+            ->getForm();
+    }
+
+    /**
+     * @Route("reset")
+     * @Method({"POST"})
+     */
+    public function resetAction(Request $request)
+    {
+        $form = $this->getResetForm();
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $q = $em->createQuery('delete from Levi9EProjectBundle:Row');
+            $numDeleted = $q->execute();
+            return $this->redirect($this->generateUrl('levi9_eproject_default_index'));
+        }
+    }
+
+    /**
+     * Get collected batteries statistic
+     *
+     * @return array
+     */
+    protected function getStatistics()
+    {
+        $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
+        $qb->select('SUM(row.count) as cnt, row.type')
+            ->from('Levi9EProjectBundle:Row', 'row')
+            ->groupBy('row.type')
+            ->orderBy('cnt', 'DESC');
+        return $qb->getQuery()->getResult();
     }
 }

@@ -1,6 +1,36 @@
 {% extends '::base.html.twig' %}
 
+{% block title %}Recycle Batteries!{% endblock %}
+
+{% block stylesheets %}
+    <link href="{{ asset('bundles/levi9eproject/css/main.css') }}" rel="stylesheet" />
+{% endblock %}
+
 {% block body %}
-    {{ dump(rows) }}
+    <h1>Welcome to Recycle Batteries application</h1>
+    <p>Click <a href="{{ path('levi9_eproject_default_add') }}">here</a> to add new batteries to the box</p>
+    <p>Statistics:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Battery type</th>
+                <th>Total count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in stat %}
+                <tr>
+                    <td>{{ row.type }}</td>
+                    <td>{{ row.cnt }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2">Empty</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {{ form(reset) }}
 {% endblock %}
 
