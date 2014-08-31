@@ -3,6 +3,7 @@
 namespace Levi9\EProjectBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Row
@@ -25,6 +26,7 @@ class Row
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=true)
+     * @Assert\Length(max="255")
      */
     private $name;
 
@@ -32,6 +34,8 @@ class Row
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Length(min="1", max="255")
      */
     private $type;
 
@@ -39,6 +43,7 @@ class Row
      * @var integer
      *
      * @ORM\Column(name="count", type="integer")
+     * @Assert\GreaterThan(value="0")
      */
     private $count;
 
