@@ -74,7 +74,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("reset")
+     * @Route("/reset")
      * @Method({"POST"})
      */
     public function resetAction(Request $request)
