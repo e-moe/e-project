@@ -73,6 +73,9 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testStatistics()
     {
+        //todo: tests should not rely on each other. (They can, but only if it is imppossible to make them independent)
+        //Also in functional tests you should minimize ammount of calls to a controller.
+        //So to cover this functionality, there must be one test method which will at first submit form 3 times, then make assesrts.
         $client = static::createClient();
 
         $crawler = $client->request('GET', '/');
