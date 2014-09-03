@@ -21,7 +21,7 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        $stat = $this->getStatistics();
+        $stat = $this->getRowRepository()->getStatistics();
         return array(
             'stat' => $stat,
             'reset' => $form = $this->getResetForm()->createView()
@@ -87,26 +87,18 @@ class DefaultController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $q = $em->createQuery('delete from Levi9EProjectBundle:Row');
-            $numDeleted = $q->execute();
+            $numDeleted = $this->getRowRepository()->removeAll();;
             return $this->redirect($this->generateUrl('levi9_eproject_default_index'));
         }
     }
 
     /**
-     * Get collected batteries statistic
+     * Get Doctirne Roe=w repository
      *
-     * @return array
+     * @return \Levi9\EProjectBundle\Entity\RowRepository
      */
-    protected function getStatistics()
+    protected function getRowRepository()
     {
-        $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
-        //todo: query should be defined in entity repository.
-        $qb->select('SUM(row.count) as cnt, row.type')
-            ->from('Levi9EProjectBundle:Row', 'row')
-            ->groupBy('row.type')
-            ->orderBy('cnt', 'DESC');
-        return $qb->getQuery()->getResult();
+        return $this->getDoctrine()->getRepository('Levi9EProjectBundle:Row');
     }
 }

@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Row
  *
  * @ORM\Table()
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Levi9\EProjectBundle\Entity\RowRepository")
  */
 class Row
 {
