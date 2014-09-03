@@ -1,5 +1,8 @@
+# If you use translations - translate keys (eproject.batteries.create_form.title), not sentences.
+# When you translate keys you'll definatelly do not forget to translate any string.
 Recycle Batteries: Recycle
 Welcome to Recycle Batteries application: Welcome to Recycle Batteries application
+# <a href=... - is a part of template. In this case there should be two translations: "Click %link% to add...." and "here"
 Click <a href="%url">here</a> to add new batteries to the box: Click <a href="%url">here</a> to add new batteries to the box
 Statistics: Statistics
 Battery type: Battery type

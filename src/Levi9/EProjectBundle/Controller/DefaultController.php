@@ -12,6 +12,10 @@ use Symfony\Component\HttpFoundation\Request;
 class DefaultController extends Controller
 {
     /**
+     * FYI: You could defane route name: @Route("/", name="bla_bla_bla")
+     * Then it will be more transparent, where is "levi9_eproject_default_index".
+     * Because you can search in project for "bla_bla_bla" and find the target action.
+     * 
      * @Route("/")
      * @Template()
      */
@@ -98,6 +102,7 @@ class DefaultController extends Controller
     protected function getStatistics()
     {
         $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
+        //todo: query should be defined in entity repository.
         $qb->select('SUM(row.count) as cnt, row.type')
             ->from('Levi9EProjectBundle:Row', 'row')
             ->groupBy('row.type')

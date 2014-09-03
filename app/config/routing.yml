@@ -1,3 +1,4 @@
+# Usually in global routing file there are only includes of bundles' routing files. It make sence when you have more then one bundle.
 levi9_e_project:
     resource: "@Levi9EProjectBundle/Controller"
     type:     annotation
