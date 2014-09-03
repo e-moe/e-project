@@ -3,16 +3,24 @@
 namespace Levi9\EProjectBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Client;
 
 class DefaultControllerTest extends WebTestCase
 {
+    /** @var Client */
+    private $client;
+
+    public function setUp()
+    {
+        $this->client = static::createClient();
+        $this->client->getContainer()->get('doctrine')->getRepository('Levi9EProjectBundle:Row')->removeAll();
+    }
+
     public function testIndex()
     {
-        $client = static::createClient();
+        $crawler = $this->client->request('GET', '/');
 
-        $crawler = $client->request('GET', '/');
-
-        $this->assertTrue($client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $this->assertTrue($crawler->filter('html:contains("Welcome")')->count() > 0);
     }
@@ -22,47 +30,58 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testReset()
     {
-        $client = static::createClient();
-
-        $crawler = $client->request('GET', '/');
+        $crawler = $this->client->request('GET', '/');
         $form = $crawler->selectButton('form[reset]')->form();
-        $client->submit($form);
-        $this->assertTrue($client->getResponse()->isRedirect());
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+
+        $this->client->request('GET', '/');
+        $this->assertRegExp('/<td.*?>Empty<\/td>/', $this->client->getResponse()->getContent());
+
     }
 
     public function testAddPage()
     {
-        $client = static::createClient();
+        $crawler = $this->client->request('GET', '/add');
 
-        $crawler = $client->request('GET', '/add');
-
-        $this->assertTrue($client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $this->assertTrue($crawler->filter('html:contains("Add new batteries")')->count() > 0);
+    }
+
+    /**
+     * Add Battery
+     *
+     * @param string $type
+     * @param int $count
+     * @param string $name
+     */
+    protected function addBattery($type, $count, $name = '')
+    {
+        $crawler = $this->client->request('GET', '/add');
+        $form = $crawler->selectButton('row[add]')->form();
+        $form['row[type]'] = $type;
+        $form['row[count]'] = $count;
+        $form['row[name]'] = $name;
+        $this->client->submit($form);
     }
 
     /**
      * @dataProvider addProvider
      * @depends testAddPage
      */
-    public function testAddBattery($type, $count)
+    public function testAddBattery($type, $count, $name = '')
     {
-        $client = static::createClient();
-
-        $crawler = $client->request('GET', '/add');
-        $form = $crawler->selectButton('form[add]')->form();
-        $form['form[type]'] = $type;
-        $form['form[count]'] = $count;
-        $client->submit($form);
-        $this->assertTrue($client->getResponse()->isRedirect());
+        $this->addBattery($type, $count, $name);
+        $this->assertTrue($this->client->getResponse()->isRedirect());
     }
 
     public function addProvider()
     {
         return array(
-            array('AA',  4),
-            array('AAA', 3),
-            array('AA',  1),
+            array('A',   1, 'Nick'),
+            array('AA',  2        ),
+            array('AAA', 3, 'John'),
         );
     }
 
@@ -73,24 +92,12 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testStatistics()
     {
-        //todo: tests should not rely on each other. (They can, but only if it is imppossible to make them independent)
-        //Also in functional tests you should minimize ammount of calls to a controller.
-        //So to cover this functionality, there must be one test method which will at first submit form 3 times, then make assesrts.
-        $client = static::createClient();
+        $this->addBattery('AA', 4);
+        $this->addBattery('AAA', 3);
+        $this->addBattery('AA', 1);
 
-        $crawler = $client->request('GET', '/');
-
-        $trList = $crawler->filter('tr');
-
-        $this->assertEquals(3, $trList->count());
-
-        $trAA = $trList->eq(1);
-        $trAAA = $trList->eq(2);
-
-        $this->assertEquals('AA', $trAA->children()->first()->text());
-        $this->assertEquals('5', $trAA->children()->last()->text());
-
-        $this->assertEquals('AAA', $trAAA->children()->first()->text());
-        $this->assertEquals('3', $trAAA->children()->last()->text());
+        $this->client->request('GET', '/');
+        $this->assertRegExp('/<td>AA<\/td>\s*?<td>5<\/td>/', $this->client->getResponse()->getContent());
+        $this->assertRegExp('/<td>AAA<\/td>\s*?<td>3<\/td>/', $this->client->getResponse()->getContent());
     }
 }

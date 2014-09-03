@@ -1,22 +1,28 @@
 {% extends '::base.html.twig' %}
 
-{% block title %}{% trans %}Recycle Batteries{% endtrans %}{% endblock %}
+{% block title %}{% trans %}index.title{% endtrans %}{% endblock %}
 
 {% block stylesheets %}
     <link href="{{ asset('bundles/levi9eproject/css/main.css') }}" rel="stylesheet" />
 {% endblock %}
 
 {% block body %}
-    <h1>{% trans %}Welcome to Recycle Batteries application{% endtrans %}</h1>
-    <p>{% trans with {'%url' : path('levi9_eproject_default_add')} %}
-        Click <a href="%url">here</a> to add new batteries to the box
+    <h1>{% trans %}index.welcome{% endtrans %}</h1>
+    {% set link = '<a href=%url%>%text%</a>'|trans(
+        {
+            '%url%': path('batteries_add'),
+            '%text%': 'index.add.here'|trans
+        }
+    ) %}
+    <p>{% trans with {'%link%' : link} %}
+        index.add.message
         {% endtrans %}</p>
-    <p>{% trans %}Statistics{% endtrans %}</p>
+    <p>{% trans %}index.statistics{% endtrans %}</p>
     <table>
         <thead>
             <tr>
-                <th>{% trans %}Battery type{% endtrans %}</th>
-                <th>{% trans %}Total count{% endtrans %}</th>
+                <th>{% trans %}index.table.battery_type{% endtrans %}</th>
+                <th>{% trans %}index.table.total{% endtrans %}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +33,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="2">{% trans %}Empty{% endtrans %}</td>
+                    <td colspan="2">{% trans %}index.table.empty{% endtrans %}</td>
                 </tr>
             {% endfor %}
         </tbody>

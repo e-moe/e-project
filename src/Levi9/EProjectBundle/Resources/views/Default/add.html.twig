@@ -1,10 +1,9 @@
 {% extends '::base.html.twig' %}
 
-{# {% block title %}{{ "eproject.batteries.add.title"|trans }}{% endblock %} #}
-{% block title %}{% trans %}Recycle Batteries — Add new{% endtrans %}{% endblock %}
+{% block title %}{% trans %}add.title{% endtrans %}{% endblock %}
 
 {% block body %}
-    <h1>{% trans %}Add new batteries{% endtrans %}</h1>
+    <h1>{% trans %}add.message{% endtrans %}</h1>
     {{ form(form) }}
 {% endblock %}
 
