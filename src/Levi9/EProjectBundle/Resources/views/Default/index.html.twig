@@ -8,15 +8,10 @@
 
 {% block body %}
     <h1>{% trans %}index.welcome{% endtrans %}</h1>
-    {% set link = '<a href=%url%>%text%</a>'|trans(
-        {
-            '%url%': path('batteries_add'),
-            '%text%': 'index.add.here'|trans
-        }
-    ) %}
-    <p>{% trans with {'%link%' : link} %}
-        index.add.message
-        {% endtrans %}</p>
+
+    <p>
+    {{ 'index.add.message'|trans({'%link%': block('link')})|raw }}
+    </p>
     <p>{% trans %}index.statistics{% endtrans %}</p>
     <table>
         <thead>
@@ -42,3 +37,6 @@
     {{ form(reset) }}
 {% endblock %}
 
+{% block link %}
+    <a href="{{ path('batteries_add') }}">{{ 'index.add.here'|trans }}</a>
+{% endblock %}
